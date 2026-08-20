@@ -371,7 +371,7 @@ const params = new URLSearchParams(window.location.search);
 
 /*
  * Real launch:
- * 21 August 2026 — 20:30 CEST
+ * 22 August 2026 — 15:30 CEST
  *
  * Test:
  * ?test=10
@@ -380,7 +380,7 @@ const testSeconds = Number(params.get("test"));
 
 const target = testSeconds > 0
     ? Date.now() + testSeconds * 1000
-    : new Date("2026-08-21T20:30:00+02:00").getTime();
+    : new Date("2026-08-22T15:30:00+02:00").getTime();
 
 const pad = n => String(n).padStart(2, "0");
 
