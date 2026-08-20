@@ -386,6 +386,7 @@ const pad = n => String(n).padStart(2, "0");
 
 let launched = false;
 let audioReady = false;
+let audioStarted = false;
 
 
 /* =========================================================
@@ -396,9 +397,6 @@ const launchAudio = new Audio("launch.mp3");
 
 launchAudio.preload = "auto";
 launchAudio.volume = 0.82;
-
-let audioReady = false;
-let audioStarted = false;
 
 
 /*
