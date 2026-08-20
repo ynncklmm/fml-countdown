@@ -60,16 +60,50 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 <div class="footer">583 · Football Manager League · 10 Years</div>
 </main>
 <script>
-const target=new Date("2026-08-21T20:30:00+02:00").getTime();
-const pad=n=>String(n).padStart(2,"0");
-function update(){
- const diff=Math.max(0,target-Date.now()), total=Math.floor(diff/1000);
- const d=Math.floor(total/86400),h=Math.floor(total%86400/3600),m=Math.floor(total%3600/60),s=total%60;
- document.getElementById("days").textContent=pad(d);document.getElementById("hours").textContent=pad(h);document.getElementById("minutes").textContent=pad(m);document.getElementById("seconds").textContent=pad(s);
- if(diff<=0){document.getElementById("timer").style.display="none";document.getElementById("message").style.display="none";document.getElementById("live").style.display="block";}
+const target = new Date("2026-08-21T20:30:00+02:00").getTime();
+
+const pad = n => String(n).padStart(2, "0");
+
+function showLive() {
+    document.getElementById("timer").style.display = "none";
+    document.getElementById("message").style.display = "none";
+    document.getElementById("live").style.display = "block";
+    document.querySelector(".chevrons").style.display = "none";
 }
-document.getElementById("fs").onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){}};
-update();setInterval(update,1000);
+
+function update() {
+    const diff = target - Date.now();
+
+    if (diff <= 0) {
+        showLive();
+        return;
+    }
+
+    const total = Math.floor(diff / 1000);
+
+    const d = Math.floor(total / 86400);
+    const h = Math.floor((total % 86400) / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+
+    document.getElementById("days").textContent = pad(d);
+    document.getElementById("hours").textContent = pad(h);
+    document.getElementById("minutes").textContent = pad(m);
+    document.getElementById("seconds").textContent = pad(s);
+}
+
+document.getElementById("fs").onclick = async () => {
+    try {
+        if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+        } else {
+            await document.exitFullscreen();
+        }
+    } catch (e) {}
+};
+
+update();
+setInterval(update, 1000);
 </script>
 </body>
 </html>
