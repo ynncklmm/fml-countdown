@@ -361,6 +361,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 </section>
 <div class="footer">583 · Football Manager League · 10 Years</div>
 </main>
+
 <script>
 /* =========================================================
    FFML COUNTDOWN + CINEMATIC LAUNCH ENGINE
@@ -369,15 +370,12 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 const params = new URLSearchParams(window.location.search);
 
 /*
- * NORMAL MODE
  * Real launch:
  * 21 August 2026 — 20:30 CEST
  *
- * TEST MODE
+ * Test:
  * ?test=10
- * ?test=30
  */
-
 const testSeconds = Number(params.get("test"));
 
 const target = testSeconds > 0
@@ -399,11 +397,9 @@ const launchAudio = new Audio("launch.mp3");
 launchAudio.preload = "auto";
 launchAudio.volume = 0.82;
 
-let audioReady = false;
-
 
 /*
- * User interaction unlocks audio playback.
+ * Unlock audio after a user interaction.
  */
 function armAudio(){
 
@@ -445,8 +441,7 @@ function armAudio(){
 
 
 /*
- * Start the Champions League anthem
- * during the cinematic reveal.
+ * Start the anthem during the cinematic reveal.
  */
 function playLaunchAudio(){
 
@@ -459,67 +454,59 @@ function playLaunchAudio(){
         const playPromise =
             launchAudio.play();
 
-        if (playPromise){
+        if (!playPromise) return;
 
-            playPromise
-                .then(() => {
+        playPromise
+            .then(() => {
 
-                    audioReady = true;
+                audioReady = true;
 
-                    /*
-                     * Slow 2.5 second fade-in.
-                     */
-                    let volume = 0;
+                /*
+                 * Fade anthem in over roughly 2.5 seconds.
+                 */
+                let volume = 0;
 
-                    const fade =
-                        setInterval(() => {
+                const fade =
+                    setInterval(() => {
 
-                            volume += 0.033;
+                        volume += 0.035;
 
-                            launchAudio.volume =
-                                Math.min(volume, 0.82);
+                        launchAudio.volume =
+                            Math.min(volume, 0.82);
 
-                            if (volume >= 0.82){
-                                clearInterval(fade);
-                            }
+                        if (volume >= 0.82){
+                            clearInterval(fade);
+                        }
 
-                        }, 100);
+                    }, 100);
 
-                })
-                .catch(() => {
+            })
+            .catch(() => {
 
-                    const control =
-                        document.getElementById(
-                            "soundControl"
-                        );
+                const control =
+                    document.getElementById("soundControl");
 
-                    if (control){
+                if (control){
 
-                        control.textContent =
-                            "○ TAP FOR SOUND";
+                    control.textContent =
+                        "○ TAP FOR SOUND";
 
-                        control.classList.remove(
-                            "armed"
-                        );
+                    control.classList.remove("armed");
 
-                    }
+                }
 
-                });
-
-        }
+            });
 
     }catch(e){
 
-        console.log(
-            "Launch audio unavailable."
-        );
+        console.log("Launch audio unavailable.", e);
 
     }
 }
 
 
 /*
- * Create small sound control.
+ * Small sound control in the bottom-right corner.
  */
 function createSoundControl(){
 
@@ -535,10 +522,11 @@ function createSoundControl(){
     control.type = "button";
     control.textContent = "○ SOUND ON";
 
-    control.onclick = armAudio;
+    control.addEventListener("click", armAudio);
 
     document.body.appendChild(control);
 }
+
 
 /* =========================================================
    LAUNCH OVERLAY
@@ -546,11 +534,15 @@ function createSoundControl(){
 
 function createLaunchOverlay(){
 
-    if (document.getElementById("launchOverlay")){
-        return document.getElementById("launchOverlay");
+    const existing =
+        document.getElementById("launchOverlay");
+
+    if (existing){
+        return existing;
     }
 
-    const overlay = document.createElement("div");
+    const overlay =
+        document.createElement("div");
 
     overlay.id = "launchOverlay";
     overlay.className = "launch-overlay";
@@ -558,9 +550,10 @@ function createLaunchOverlay(){
     const originalLogo =
         document.querySelector(".logo");
 
-    const logo = originalLogo
-        ? originalLogo.cloneNode(true)
-        : document.createElement("div");
+    const logo =
+        originalLogo
+            ? originalLogo.cloneNode(true)
+            : document.createElement("div");
 
     logo.className = "launch-logo";
 
@@ -605,7 +598,7 @@ function createLaunchOverlay(){
 
 
 /* =========================================================
-   LAUNCH
+   CINEMATIC LAUNCH
    ========================================================= */
 
 function showLive(){
@@ -615,7 +608,7 @@ function showLive(){
     launched = true;
 
     /*
-     * Stop normal page elements.
+     * Hide normal countdown content.
      */
     document.getElementById("timer").style.display = "none";
     document.getElementById("message").style.display = "none";
@@ -628,7 +621,7 @@ function showLive(){
     }
 
     /*
-     * Prepare cinematic overlay.
+     * Create cinematic layer.
      */
     const overlay =
         createLaunchOverlay();
@@ -636,23 +629,28 @@ function showLive(){
     /*
      * Fade the original page away.
      */
-    document.querySelector(".content").style.opacity = "0";
+    const content =
+        document.querySelector(".content");
+
+    if (content){
+        content.style.opacity = "0";
+    }
 
     /*
-     * Hold complete darkness for 2 seconds.
+     * Hold the screen completely dark.
      */
     setTimeout(() => {
 
         overlay.classList.add("active");
 
         /*
-         * Start the anthem.
+         * Start anthem.
          */
         playLaunchAudio();
 
         /*
-         * The button appears after 9 seconds.
-         * Then it starts pulsing.
+         * The button animation itself begins at 9s.
+         * We add the pulse one second later.
          */
         setTimeout(() => {
 
@@ -666,82 +664,6 @@ function showLive(){
         }, 10000);
 
     }, 2000);
-}
-
-/* =========================================================
-   PLAY ANTHEM
-   ========================================================= */
-
-function playLaunchAudio(){
-
-    try{
-
-        launchAudio.currentTime = 0;
-
-        launchAudio.volume = 0;
-
-        const playPromise =
-            launchAudio.play();
-
-        if (playPromise){
-
-            playPromise
-                .then(() => {
-
-                    audioReady = true;
-
-                    /*
-                     * Slow fade-in of the anthem.
-                     */
-                    let volume = 0;
-
-                    const fade =
-                        setInterval(() => {
-
-                            volume += .035;
-
-                            launchAudio.volume =
-                                Math.min(volume, .82);
-
-                            if (volume >= .82){
-                                clearInterval(fade);
-                            }
-
-                        }, 100);
-
-                })
-                .catch(() => {
-
-                    /*
-                     * Browser blocked autoplay.
-                     */
-                    const control =
-                        document.getElementById(
-                            "soundControl"
-                        );
-
-                    if (control){
-
-                        control.textContent =
-                            "○ TAP FOR SOUND";
-
-                        control.classList.remove(
-                            "armed"
-                        );
-
-                    }
-
-                });
-
-        }
-
-    }catch(e){
-
-        console.log(
-            "Launch audio unavailable."
-        );
-
-    }
 }
 
 
@@ -794,26 +716,28 @@ function update(){
    FULLSCREEN
    ========================================================= */
 
-document.getElementById("fs").onclick =
-async () => {
+document.getElementById("fs").addEventListener(
+    "click",
+    async () => {
 
-    try{
+        try{
 
-        if (!document.fullscreenElement){
+            if (!document.fullscreenElement){
 
-            await document
-                .documentElement
-                .requestFullscreen();
+                await document
+                    .documentElement
+                    .requestFullscreen();
 
-        }else{
+            }else{
 
-            await document.exitFullscreen();
+                await document.exitFullscreen();
 
-        }
+            }
 
-    }catch(e){}
+        }catch(e){}
 
-};
+    }
+);
 
 
 /* =========================================================
