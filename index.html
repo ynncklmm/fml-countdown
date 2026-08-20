@@ -47,7 +47,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#000;
+  background:transparent;
   opacity:0;
   visibility:hidden;
   overflow:hidden;
@@ -627,7 +627,8 @@ function showLive(){
         createLaunchOverlay();
 
     /*
-     * Fade the original page away.
+     * Hide the original countdown content.
+     * Keep the FFML background visible.
      */
     const content =
         document.querySelector(".content");
@@ -637,33 +638,28 @@ function showLive(){
     }
 
     /*
-     * Hold the screen completely dark.
+     * Start the cinematic reveal immediately.
+     * No black-screen delay.
+     *
+     * The anthem is already playing
+     * since T-10 seconds.
+     */
+    overlay.classList.add("active");
+
+    /*
+     * The button appears first.
+     * One second later it starts pulsing.
      */
     setTimeout(() => {
 
-        overlay.classList.add("active");
+        const button =
+            overlay.querySelector(".launch-enter");
 
-        /*
-         * Start anthem.
-         */
-        playLaunchAudio();
+        if (button){
+            button.classList.add("ready");
+        }
 
-        /*
-         * The button animation itself begins at 9s.
-         * We add the pulse one second later.
-         */
-        setTimeout(() => {
-
-            const button =
-                overlay.querySelector(".launch-enter");
-
-            if (button){
-                button.classList.add("ready");
-            }
-
-        }, 10000);
-
-    }, 2000);
+    }, 10000);
 }
 
 
@@ -676,6 +672,20 @@ function update(){
     const diff =
         target - Date.now();
 
+    /*
+     * Start the anthem at T-10 seconds.
+     */
+    if (
+        diff <= 10000 &&
+        diff > 0 &&
+        !audioReady
+    ){
+        playLaunchAudio();
+    }
+
+    /*
+     * Countdown finished.
+     */
     if (diff <= 0){
 
         showLive();
@@ -710,7 +720,6 @@ function update(){
     document.getElementById("seconds")
         .textContent = pad(s);
 }
-
 
 /* =========================================================
    FULLSCREEN
