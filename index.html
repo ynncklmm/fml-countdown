@@ -399,9 +399,11 @@ const launchAudio = new Audio("launch.mp3");
 launchAudio.preload = "auto";
 launchAudio.volume = 0.82;
 
+let audioReady = false;
+
 
 /*
- * User interaction unlocks the audio.
+ * User interaction unlocks audio playback.
  */
 function armAudio(){
 
@@ -443,6 +445,80 @@ function armAudio(){
 
 
 /*
+ * Start the Champions League anthem
+ * during the cinematic reveal.
+ */
+function playLaunchAudio(){
+
+    try{
+
+        launchAudio.currentTime = 0;
+        launchAudio.muted = false;
+        launchAudio.volume = 0;
+
+        const playPromise =
+            launchAudio.play();
+
+        if (playPromise){
+
+            playPromise
+                .then(() => {
+
+                    audioReady = true;
+
+                    /*
+                     * Slow 2.5 second fade-in.
+                     */
+                    let volume = 0;
+
+                    const fade =
+                        setInterval(() => {
+
+                            volume += 0.033;
+
+                            launchAudio.volume =
+                                Math.min(volume, 0.82);
+
+                            if (volume >= 0.82){
+                                clearInterval(fade);
+                            }
+
+                        }, 100);
+
+                })
+                .catch(() => {
+
+                    const control =
+                        document.getElementById(
+                            "soundControl"
+                        );
+
+                    if (control){
+
+                        control.textContent =
+                            "○ TAP FOR SOUND";
+
+                        control.classList.remove(
+                            "armed"
+                        );
+
+                    }
+
+                });
+
+        }
+
+    }catch(e){
+
+        console.log(
+            "Launch audio unavailable."
+        );
+
+    }
+}
+
+
+/*
  * Create small sound control.
  */
 function createSoundControl(){
@@ -451,7 +527,8 @@ function createSoundControl(){
         return;
     }
 
-    const control = document.createElement("button");
+    const control =
+        document.createElement("button");
 
     control.id = "soundControl";
     control.className = "sound-control";
@@ -462,7 +539,6 @@ function createSoundControl(){
 
     document.body.appendChild(control);
 }
-
 
 /* =========================================================
    LAUNCH OVERLAY
@@ -542,7 +618,6 @@ function showLive(){
      * Stop normal page elements.
      */
     document.getElementById("timer").style.display = "none";
-
     document.getElementById("message").style.display = "none";
 
     const chevrons =
@@ -559,27 +634,39 @@ function showLive(){
         createLaunchOverlay();
 
     /*
-     * First fade the old content completely away.
+     * Fade the original page away.
      */
     document.querySelector(".content").style.opacity = "0";
 
     /*
-     * Wait in darkness.
-     *
-     * This is intentionally longer.
+     * Hold complete darkness for 2 seconds.
      */
     setTimeout(() => {
 
         overlay.classList.add("active");
 
         /*
-         * Start Champions League anthem.
+         * Start the anthem.
          */
         playLaunchAudio();
 
+        /*
+         * The button appears after 9 seconds.
+         * Then it starts pulsing.
+         */
+        setTimeout(() => {
+
+            const button =
+                overlay.querySelector(".launch-enter");
+
+            if (button){
+                button.classList.add("ready");
+            }
+
+        }, 10000);
+
     }, 2000);
 }
-
 
 /* =========================================================
    PLAY ANTHEM
