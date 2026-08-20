@@ -50,32 +50,30 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
   background:#000;
   opacity:0;
   visibility:hidden;
-  transition:opacity 900ms ease, visibility 0s linear 900ms;
   overflow:hidden;
-}
-
-.launch-overlay::before{
-  content:"";
-  position:absolute;
-  inset:-20%;
-  background:
-    radial-gradient(circle at 50% 45%,rgba(25,125,78,.20),transparent 28%),
-    radial-gradient(circle at 50% 50%,rgba(200,162,74,.10),transparent 42%);
-  filter:blur(40px);
-  opacity:0;
-  transform:scale(.8);
-  transition:opacity 2.4s ease,transform 2.8s cubic-bezier(.2,.8,.2,1);
+  transition:opacity 1.2s ease,visibility 0s linear 1.2s;
 }
 
 .launch-overlay.active{
   opacity:1;
   visibility:visible;
-  transition:opacity 900ms ease;
+  transition:opacity 1.2s ease;
+}
+
+.launch-overlay::before{
+  content:"";
+  position:absolute;
+  inset:-25%;
+  background:
+    radial-gradient(circle at 50% 44%,rgba(20,125,76,.22),transparent 24%),
+    radial-gradient(circle at 50% 52%,rgba(200,162,74,.12),transparent 40%);
+  filter:blur(55px);
+  opacity:0;
+  transform:scale(.72);
 }
 
 .launch-overlay.active::before{
-  opacity:1;
-  transform:scale(1.2);
+  animation:launchAtmosphere 5s ease 2.1s forwards;
 }
 
 .launch-content{
@@ -86,33 +84,35 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-logo{
+  display:block;
   width:min(390px,62vw);
   max-height:390px;
+  margin:0 auto;
   object-fit:contain;
   opacity:0;
-  transform:translateY(35px) scale(.88);
+  transform:translateY(40px) scale(.86);
   filter:
     drop-shadow(0 0 0 rgba(200,162,74,0))
-    drop-shadow(0 20px 60px rgba(0,0,0,.8));
+    drop-shadow(0 25px 70px rgba(0,0,0,.9));
 }
 
 .launch-overlay.active .launch-logo{
-  animation:launchLogo 2s cubic-bezier(.16,1,.3,1) .45s forwards;
+  animation:launchLogoReveal 4s cubic-bezier(.16,1,.3,1) 2.3s forwards;
 }
 
 .launch-kicker{
-  margin-top:10px;
+  margin-top:4px;
   color:var(--gold);
   font-size:12px;
   font-weight:850;
   letter-spacing:6px;
   text-transform:uppercase;
   opacity:0;
-  transform:translateY(15px);
+  transform:translateY(18px);
 }
 
 .launch-overlay.active .launch-kicker{
-  animation:launchText 1s ease 1.45s forwards;
+  animation:launchTextReveal 1.4s ease 4.4s forwards;
 }
 
 .launch-title{
@@ -121,19 +121,20 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
   font-family:Georgia,"Times New Roman",serif;
   font-size:clamp(58px,9vw,118px);
   line-height:.88;
-  letter-spacing:2px;
+  letter-spacing:10px;
   opacity:0;
   transform:translateY(25px) scale(.97);
 }
 
 .launch-overlay.active .launch-title{
-  animation:launchTitle 1.2s cubic-bezier(.16,1,.3,1) 1.75s forwards;
+  animation:launchTitleReveal 2.2s cubic-bezier(.16,1,.3,1) 5s forwards;
 }
 
 .launch-sub{
-  margin:24px auto 0;
+  margin:26px auto 0;
   color:var(--muted);
   font-size:clamp(12px,1.5vw,17px);
+  line-height:1.8;
   letter-spacing:4px;
   text-transform:uppercase;
   opacity:0;
@@ -141,7 +142,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-sub{
-  animation:launchText 1s ease 2.7s forwards;
+  animation:launchTextReveal 1.3s ease 6.7s forwards;
 }
 
 .launch-enter{
@@ -166,9 +167,11 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-enter{
-  animation:
-    launchText 1s ease 3.35s forwards,
-    launchPulse 2s ease-in-out 4.35s infinite;
+  animation:launchButtonReveal 1s cubic-bezier(.16,1,.3,1) 9s forwards;
+}
+
+.launch-overlay.active .launch-enter.ready{
+  animation:launchPulse 2s ease-in-out infinite;
 }
 
 .launch-note{
@@ -181,32 +184,77 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-note{
-  animation:launchText 1s ease 3.8s forwards;
+  animation:launchTextReveal 1s ease 9.8s forwards;
 }
 
-@keyframes launchLogo{
+.sound-control{
+  position:fixed;
+  z-index:120;
+  right:24px;
+  bottom:24px;
+  border:1px solid rgba(200,162,74,.45);
+  border-radius:999px;
+  background:rgba(3,18,13,.78);
+  color:var(--muted);
+  padding:10px 15px;
+  backdrop-filter:blur(14px);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:border-color .25s ease,color .25s ease,background .25s ease;
+}
+
+.sound-control:hover{
+  border-color:var(--gold);
+  color:var(--ivory);
+}
+
+.sound-control.armed{
+  border-color:var(--gold);
+  color:var(--gold);
+}
+
+@keyframes launchAtmosphere{
   0%{
     opacity:0;
-    transform:translateY(35px) scale(.88);
-    filter:drop-shadow(0 0 0 rgba(200,162,74,0));
+    transform:scale(.72);
   }
-  55%{
+  100%{
     opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+@keyframes launchLogoReveal{
+  0%{
+    opacity:0;
+    transform:translateY(40px) scale(.86);
+    filter:
+      drop-shadow(0 0 0 rgba(200,162,74,0))
+      drop-shadow(0 25px 70px rgba(0,0,0,.9));
+  }
+  35%{
+    opacity:.35;
+  }
+  70%{
+    opacity:.88;
   }
   100%{
     opacity:1;
     transform:translateY(0) scale(1);
     filter:
-      drop-shadow(0 0 24px rgba(200,162,74,.22))
-      drop-shadow(0 20px 60px rgba(0,0,0,.8));
+      drop-shadow(0 0 28px rgba(200,162,74,.25))
+      drop-shadow(0 25px 70px rgba(0,0,0,.9));
   }
 }
 
-@keyframes launchTitle{
+@keyframes launchTitleReveal{
   0%{
     opacity:0;
     transform:translateY(25px) scale(.97);
-    letter-spacing:12px;
+    letter-spacing:14px;
   }
   100%{
     opacity:1;
@@ -215,29 +263,43 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
   }
 }
 
-@keyframes launchText{
-  from{
+@keyframes launchTextReveal{
+  0%{
     opacity:0;
     transform:translateY(15px);
   }
-  to{
+  100%{
     opacity:1;
     transform:translateY(0);
   }
 }
 
+@keyframes launchButtonReveal{
+  0%{
+    opacity:0;
+    transform:translateY(20px) scale(.92);
+  }
+  100%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    box-shadow:0 0 0 rgba(200,162,74,0);
+  }
+}
+
 @keyframes launchPulse{
   0%,100%{
+    opacity:1;
+    transform:scale(1);
     box-shadow:
       0 0 0 0 rgba(200,162,74,0),
       0 0 0 rgba(200,162,74,0);
-    transform:scale(1);
   }
   50%{
-    box-shadow:
-      0 0 0 10px rgba(200,162,74,.08),
-      0 0 45px rgba(200,162,74,.25);
+    opacity:1;
     transform:scale(1.035);
+    box-shadow:
+      0 0 0 11px rgba(200,162,74,.07),
+      0 0 42px rgba(200,162,74,.28);
   }
 }
 
@@ -259,7 +321,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
   .launch-sub{
     font-size:9px;
     letter-spacing:2px;
-    line-height:1.7;
+    line-height:1.8;
   }
 
   .launch-enter{
@@ -267,9 +329,15 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
     padding:15px 24px;
     font-size:11px;
   }
-}    
-    
-@media(max-width:650px){.page{padding:28px 10px 58px}.top{top:12px;left:12px;right:12px}.badge,.fs{padding:8px 10px;font-size:8px;letter-spacing:1px}.logo{width:min(330px,84vw);max-height:350px}h1{font-size:27px}.sub{font-size:9px;letter-spacing:1px}.timer{margin-top:28px;padding:20px 7px;border-radius:16px}.unit .num{font-size:clamp(34px,11vw,52px);letter-spacing:-2px}.unit .label{font-size:7px;letter-spacing:1px}.colon{font-size:29px}.message{font-size:15px}.footer{font-size:7px;letter-spacing:2px}}
+
+  .sound-control{
+    right:12px;
+    bottom:12px;
+    font-size:8px;
+  }
+}
+
+
 </style>
 </head>
 <body>
@@ -294,38 +362,125 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 <div class="footer">583 · Football Manager League · 10 Years</div>
 </main>
 <script>
+/* =========================================================
+   FFML COUNTDOWN + CINEMATIC LAUNCH ENGINE
+   ========================================================= */
+
 const params = new URLSearchParams(window.location.search);
 
 /*
- * NORMAL:
- * Real launch = 21.08.2026 20:30 CEST
+ * NORMAL MODE
+ * Real launch:
+ * 21 August 2026 — 20:30 CEST
  *
- * TEST:
- * ?test=10  -> launch after 10 seconds
- * ?test=30  -> launch after 30 seconds
+ * TEST MODE
+ * ?test=10
+ * ?test=30
  */
 
 const testSeconds = Number(params.get("test"));
 
 const target = testSeconds > 0
-    ? Date.now() + (testSeconds * 1000)
+    ? Date.now() + testSeconds * 1000
     : new Date("2026-08-21T20:30:00+02:00").getTime();
 
 const pad = n => String(n).padStart(2, "0");
 
 let launched = false;
+let audioReady = false;
 
-function createLaunchOverlay() {
 
-    if (document.getElementById("launchOverlay")) {
+/* =========================================================
+   AUDIO
+   ========================================================= */
+
+const launchAudio = new Audio("launch.mp3");
+
+launchAudio.preload = "auto";
+launchAudio.volume = 0.82;
+
+
+/*
+ * User interaction unlocks the audio.
+ */
+function armAudio(){
+
+    if (audioReady) return;
+
+    launchAudio.muted = true;
+
+    launchAudio.play()
+        .then(() => {
+
+            launchAudio.pause();
+            launchAudio.currentTime = 0;
+            launchAudio.muted = false;
+
+            audioReady = true;
+
+            const control =
+                document.getElementById("soundControl");
+
+            if (control){
+
+                control.textContent = "● SOUND ARMED";
+                control.classList.add("armed");
+
+            }
+
+        })
+        .catch(() => {
+
+            const control =
+                document.getElementById("soundControl");
+
+            if (control){
+                control.textContent = "○ SOUND OFF";
+            }
+
+        });
+}
+
+
+/*
+ * Create small sound control.
+ */
+function createSoundControl(){
+
+    if (document.getElementById("soundControl")){
+        return;
+    }
+
+    const control = document.createElement("button");
+
+    control.id = "soundControl";
+    control.className = "sound-control";
+    control.type = "button";
+    control.textContent = "○ SOUND ON";
+
+    control.onclick = armAudio;
+
+    document.body.appendChild(control);
+}
+
+
+/* =========================================================
+   LAUNCH OVERLAY
+   ========================================================= */
+
+function createLaunchOverlay(){
+
+    if (document.getElementById("launchOverlay")){
         return document.getElementById("launchOverlay");
     }
 
     const overlay = document.createElement("div");
+
     overlay.id = "launchOverlay";
     overlay.className = "launch-overlay";
 
-    const originalLogo = document.querySelector(".logo");
+    const originalLogo =
+        document.querySelector(".logo");
 
     const logo = originalLogo
         ? originalLogo.cloneNode(true)
@@ -335,6 +490,7 @@ function createLaunchOverlay() {
 
     overlay.innerHTML = `
         <div class="launch-content">
+
             <div class="launch-kicker">
                 FFML · 10 YEARS OF HISTORY
             </div>
@@ -358,10 +514,13 @@ function createLaunchOverlay() {
             <div class="launch-note">
                 583 · EST. 2017/18
             </div>
+
         </div>
     `;
 
-    overlay.querySelector(".launch-content").prepend(logo);
+    overlay
+        .querySelector(".launch-content")
+        .prepend(logo);
 
     document.body.appendChild(overlay);
 
@@ -369,196 +528,217 @@ function createLaunchOverlay() {
 }
 
 
-/*
- * Cinematic launch sound.
- *
- * Uses Web Audio instead of an external file,
- * so we can test the entire reveal immediately.
- */
-function playLaunchSound() {
+/* =========================================================
+   LAUNCH
+   ========================================================= */
 
-    try {
-
-        const AudioContext =
-            window.AudioContext || window.webkitAudioContext;
-
-        if (!AudioContext) return;
-
-        const ctx = new AudioContext();
-
-        if (ctx.state === "suspended") {
-            ctx.resume();
-        }
-
-        const now = ctx.currentTime;
-
-        /*
-         * Deep cinematic impact
-         */
-        const boom = ctx.createOscillator();
-        const boomGain = ctx.createGain();
-
-        boom.type = "sine";
-        boom.frequency.setValueAtTime(85, now);
-        boom.frequency.exponentialRampToValueAtTime(38, now + 1.5);
-
-        boomGain.gain.setValueAtTime(.0001, now);
-        boomGain.gain.exponentialRampToValueAtTime(.65, now + .08);
-        boomGain.gain.exponentialRampToValueAtTime(.0001, now + 2.2);
-
-        boom.connect(boomGain);
-        boomGain.connect(ctx.destination);
-
-        boom.start(now);
-        boom.stop(now + 2.3);
-
-
-        /*
-         * Rising harmonic chord
-         */
-        const notes = [220, 277.18, 329.63, 440];
-
-        notes.forEach((frequency, index) => {
-
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            osc.type = "triangle";
-
-            osc.frequency.setValueAtTime(
-                frequency * .5,
-                now + index * .12
-            );
-
-            osc.frequency.exponentialRampToValueAtTime(
-                frequency,
-                now + 1.4 + index * .12
-            );
-
-            gain.gain.setValueAtTime(.0001, now + index * .12);
-
-            gain.gain.exponentialRampToValueAtTime(
-                .045,
-                now + .8 + index * .12
-            );
-
-            gain.gain.exponentialRampToValueAtTime(
-                .0001,
-                now + 3.4
-            );
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-
-            osc.start(now + index * .12);
-            osc.stop(now + 3.5);
-        });
-
-    } catch (e) {
-        console.log("Launch audio unavailable.");
-    }
-}
-
-
-/*
- * THE ACTUAL REVEAL
- */
-function showLive() {
+function showLive(){
 
     if (launched) return;
 
     launched = true;
 
-    const overlay = createLaunchOverlay();
-
     /*
-     * Kill the normal countdown view.
+     * Stop normal page elements.
      */
     document.getElementById("timer").style.display = "none";
+
     document.getElementById("message").style.display = "none";
 
-    const chevrons = document.querySelector(".chevrons");
+    const chevrons =
+        document.querySelector(".chevrons");
 
-    if (chevrons) {
+    if (chevrons){
         chevrons.style.display = "none";
     }
 
     /*
-     * Fade out the old page.
+     * Prepare cinematic overlay.
+     */
+    const overlay =
+        createLaunchOverlay();
+
+    /*
+     * First fade the old content completely away.
      */
     document.querySelector(".content").style.opacity = "0";
 
     /*
-     * Blackout first.
+     * Wait in darkness.
+     *
+     * This is intentionally longer.
      */
     setTimeout(() => {
 
         overlay.classList.add("active");
 
         /*
-         * Sound starts with the visual reveal.
+         * Start Champions League anthem.
          */
-        playLaunchSound();
+        playLaunchAudio();
 
-    }, 700);
+    }, 2000);
 }
 
 
-/*
- * COUNTDOWN
- */
-function update() {
+/* =========================================================
+   PLAY ANTHEM
+   ========================================================= */
 
-    const diff = target - Date.now();
+function playLaunchAudio(){
 
-    if (diff <= 0) {
+    try{
+
+        launchAudio.currentTime = 0;
+
+        launchAudio.volume = 0;
+
+        const playPromise =
+            launchAudio.play();
+
+        if (playPromise){
+
+            playPromise
+                .then(() => {
+
+                    audioReady = true;
+
+                    /*
+                     * Slow fade-in of the anthem.
+                     */
+                    let volume = 0;
+
+                    const fade =
+                        setInterval(() => {
+
+                            volume += .035;
+
+                            launchAudio.volume =
+                                Math.min(volume, .82);
+
+                            if (volume >= .82){
+                                clearInterval(fade);
+                            }
+
+                        }, 100);
+
+                })
+                .catch(() => {
+
+                    /*
+                     * Browser blocked autoplay.
+                     */
+                    const control =
+                        document.getElementById(
+                            "soundControl"
+                        );
+
+                    if (control){
+
+                        control.textContent =
+                            "○ TAP FOR SOUND";
+
+                        control.classList.remove(
+                            "armed"
+                        );
+
+                    }
+
+                });
+
+        }
+
+    }catch(e){
+
+        console.log(
+            "Launch audio unavailable."
+        );
+
+    }
+}
+
+
+/* =========================================================
+   COUNTDOWN
+   ========================================================= */
+
+function update(){
+
+    const diff =
+        target - Date.now();
+
+    if (diff <= 0){
 
         showLive();
 
         return;
     }
 
-    const total = Math.floor(diff / 1000);
+    const total =
+        Math.floor(diff / 1000);
 
-    const d = Math.floor(total / 86400);
-    const h = Math.floor((total % 86400) / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
+    const d =
+        Math.floor(total / 86400);
 
-    document.getElementById("days").textContent = pad(d);
-    document.getElementById("hours").textContent = pad(h);
-    document.getElementById("minutes").textContent = pad(m);
-    document.getElementById("seconds").textContent = pad(s);
+    const h =
+        Math.floor((total % 86400) / 3600);
+
+    const m =
+        Math.floor((total % 3600) / 60);
+
+    const s =
+        total % 60;
+
+    document.getElementById("days")
+        .textContent = pad(d);
+
+    document.getElementById("hours")
+        .textContent = pad(h);
+
+    document.getElementById("minutes")
+        .textContent = pad(m);
+
+    document.getElementById("seconds")
+        .textContent = pad(s);
 }
 
 
-/*
- * FULLSCREEN
- */
-document.getElementById("fs").onclick = async () => {
+/* =========================================================
+   FULLSCREEN
+   ========================================================= */
 
-    try {
+document.getElementById("fs").onclick =
+async () => {
 
-        if (!document.fullscreenElement) {
+    try{
 
-            await document.documentElement.requestFullscreen();
+        if (!document.fullscreenElement){
 
-        } else {
+            await document
+                .documentElement
+                .requestFullscreen();
+
+        }else{
 
             await document.exitFullscreen();
 
         }
 
-    } catch (e) {}
+    }catch(e){}
+
 };
 
 
-/*
- * INITIALIZE
- */
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+createSoundControl();
+
 update();
 
 setInterval(update, 1000);
+
 </script>
 </body>
 </html>
