@@ -397,9 +397,15 @@ const launchAudio = new Audio("launch.mp3");
 launchAudio.preload = "auto";
 launchAudio.volume = 0.82;
 
+let audioReady = false;
+let audioStarted = false;
+
 
 /*
- * Unlock audio after a user interaction.
+ * Unlock audio after user interaction.
+ *
+ * The browser requires a user gesture before
+ * we are allowed to start the anthem later.
  */
 function armAudio(){
 
@@ -426,6 +432,20 @@ function armAudio(){
 
             }
 
+            /*
+             * If the user activates sound after
+             * T-10 seconds, start immediately.
+             */
+            const remaining =
+                target - Date.now();
+
+            if (
+                remaining <= 10000 &&
+                remaining > 0
+            ){
+                playLaunchAudio();
+            }
+
         })
         .catch(() => {
 
@@ -441,9 +461,17 @@ function armAudio(){
 
 
 /*
- * Start the anthem during the cinematic reveal.
+ * Start the anthem.
+ *
+ * This function can only start the audio once.
  */
 function playLaunchAudio(){
+
+    if (audioStarted) return;
+
+    if (!audioReady) return;
+
+    audioStarted = true;
 
     try{
 
@@ -454,12 +482,13 @@ function playLaunchAudio(){
         const playPromise =
             launchAudio.play();
 
-        if (!playPromise) return;
+        if (!playPromise){
+            audioStarted = false;
+            return;
+        }
 
         playPromise
             .then(() => {
-
-                audioReady = true;
 
                 /*
                  * Fade anthem in over roughly 2.5 seconds.
@@ -483,6 +512,8 @@ function playLaunchAudio(){
             })
             .catch(() => {
 
+                audioStarted = false;
+
                 const control =
                     document.getElementById("soundControl");
 
@@ -491,7 +522,9 @@ function playLaunchAudio(){
                     control.textContent =
                         "○ TAP FOR SOUND";
 
-                    control.classList.remove("armed");
+                    control.classList.remove(
+                        "armed"
+                    );
 
                 }
 
@@ -499,7 +532,12 @@ function playLaunchAudio(){
 
     }catch(e){
 
-        console.log("Launch audio unavailable.", e);
+        audioStarted = false;
+
+        console.log(
+            "Launch audio unavailable.",
+            e
+        );
 
     }
 }
@@ -522,7 +560,10 @@ function createSoundControl(){
     control.type = "button";
     control.textContent = "○ SOUND ON";
 
-    control.addEventListener("click", armAudio);
+    control.addEventListener(
+        "click",
+        armAudio
+    );
 
     document.body.appendChild(control);
 }
@@ -676,12 +717,13 @@ function update(){
      * Start the anthem at T-10 seconds.
      */
     if (
-        diff <= 10000 &&
-        diff > 0 &&
-        !audioReady
-    ){
-        playLaunchAudio();
-    }
+    diff <= 10000 &&
+    diff > 0 &&
+    audioReady &&
+    !audioStarted
+){
+    playLaunchAudio();
+}
 
     /*
      * Countdown finished.
