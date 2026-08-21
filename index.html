@@ -676,14 +676,16 @@ function showLive(){
     }
 
     /*
-     * Hide the decorative chevrons.
-     */
-    const chevrons =
-        document.querySelector(".chevrons");
+ * Hide the decorative chevrons without
+ * changing the content layout.
+ */
+const chevrons =
+    document.querySelector(".chevrons");
 
-    if (chevrons){
-        chevrons.style.display = "none";
-    }
+if (chevrons){
+    chevrons.style.opacity = "0";
+    chevrons.style.pointerEvents = "none";
+}
 
     /*
      * Create cinematic layer.
