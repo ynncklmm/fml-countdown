@@ -438,7 +438,7 @@ function armAudio(){
                 target - Date.now();
 
             if (
-                remaining <= 10000 &&
+                remaining <= 20000 &&
                 remaining > 0
             ){
                 playLaunchAudio();
@@ -715,7 +715,7 @@ function update(){
      * Start the anthem at T-10 seconds.
      */
     if (
-    diff <= 10000 &&
+    diff <= 20000 &&
     diff > 0 &&
     audioReady &&
     !audioStarted
