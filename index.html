@@ -37,8 +37,20 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 @keyframes bounce{50%{transform:translateY(7px)}}
 
 /* =========================================================
-   CINEMATIC LAUNCH REVEAL
+   COUNTDOWN FADE OUT
    ========================================================= */
+
+.content{
+  transition:opacity 2.2s ease;
+}
+
+.content.countdown-fadeout{
+  opacity:0;
+}
+   
+/* =========================================================
+CINEMATIC LAUNCH REVEAL
+========================================================= */
 
 .launch-overlay{
   position:fixed;
@@ -97,7 +109,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-logo{
-  animation:launchLogoReveal 4s cubic-bezier(.16,1,.3,1) 2.3s forwards;
+  animation:launchLogoReveal 3.5s cubic-bezier(.16,1,.3,1) 2.5s forwards;
 }
 
 .launch-kicker{
@@ -112,7 +124,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-kicker{
-  animation:launchTextReveal 1.4s ease 4.4s forwards;
+  animation:launchTextReveal 1.4s ease 6.2s forwards;
 }
 
 .launch-title{
@@ -127,7 +139,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-title{
-  animation:launchTitleReveal 2.2s cubic-bezier(.16,1,.3,1) 5s forwards;
+  animation:launchTitleReveal 2.2s cubic-bezier(.16,1,.3,1) 8.3s forwards;
 }
 
 .launch-sub{
@@ -142,7 +154,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-sub{
-  animation:launchTextReveal 1.3s ease 6.7s forwards;
+  animation:launchTextReveal 1.3s ease 11.8s forwards;
 }
 
 .launch-enter{
@@ -167,7 +179,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-enter{
-  animation:launchButtonReveal 1s cubic-bezier(.16,1,.3,1) 9s forwards;
+  animation:launchButtonReveal 1.2s cubic-bezier(.16,1,.3,1) 15.5s forwards;
 }
 
 .launch-overlay.active .launch-enter.ready{
@@ -184,7 +196,7 @@ h1{margin:10px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2
 }
 
 .launch-overlay.active .launch-note{
-  animation:launchTextReveal 1s ease 9.8s forwards;
+  animation:launchTextReveal 1s ease 16.8s forwards;
 }
 
 .sound-control{
@@ -647,11 +659,18 @@ function showLive(){
     launched = true;
 
     /*
-     * Hide normal countdown content.
+     * Hide countdown elements gradually.
      */
-    document.getElementById("timer").style.display = "none";
-    document.getElementById("message").style.display = "none";
+    const content =
+        document.querySelector(".content");
 
+    if (content){
+        content.classList.add("countdown-fadeout");
+    }
+
+    /*
+     * Hide the decorative chevrons.
+     */
     const chevrons =
         document.querySelector(".chevrons");
 
@@ -666,39 +685,29 @@ function showLive(){
         createLaunchOverlay();
 
     /*
-     * Hide the original countdown content.
-     * Keep the FFML background visible.
-     */
-    const content =
-        document.querySelector(".content");
-
-    if (content){
-        content.style.opacity = "0";
-    }
-
-    /*
-     * Start the cinematic reveal immediately.
-     * No black-screen delay.
-     *
-     * The anthem is already playing
-     * since T-10 seconds.
-     */
-    overlay.classList.add("active");
-
-    /*
-     * The button appears first.
-     * One second later it starts pulsing.
+     * Give the original content time to fade away
+     * before revealing the cinematic sequence.
      */
     setTimeout(() => {
 
-        const button =
-            overlay.querySelector(".launch-enter");
+        overlay.classList.add("active");
 
-        if (button){
-            button.classList.add("ready");
-        }
+        /*
+         * Button starts pulsing after it has been
+         * visible for a short moment.
+         */
+        setTimeout(() => {
 
-    }, 10000);
+            const button =
+                overlay.querySelector(".launch-enter");
+
+            if (button){
+                button.classList.add("ready");
+            }
+
+        }, 1000);
+
+    }, 2200);
 }
 
 
